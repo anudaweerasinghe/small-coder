@@ -17,3 +17,6 @@ LEVER is a technique that builds off existing code LLMs to improve code generati
 
 == Competition Level Code Generation with AlphaCode @li2022competition
 AlphaCode is a model built to solve competitive programming problems. A model pre-trained on code and fine-tuned on Codeforces problems is used to generate a large set of sample solutions. These solutions are filtered and clustered on program behavior using their outputs, and a candidate program is picked from each cluster.
+
+== TinyLlama: An Open-Source Small Language Model @zhang2024tinyllama
+A 1.1b 
