@@ -4,3 +4,4 @@ evaluate
 torch
 ipykernel
 trl
+transformers[torch]
