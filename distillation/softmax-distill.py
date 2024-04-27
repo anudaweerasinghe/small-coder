@@ -51,6 +51,12 @@ def startDistillation():
     tokenizer = AutoTokenizer.from_pretrained("codellama/CodeLlama-7b-Python-hf")
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=tiny_llama_model)
 
+
+    def preprocess_function(examples):
+        return tokenizer(f"{examples["instruction"]}\n{examples["input"]}\n```\n{examples["output"]}\n```", truncation=True)
+
+    tokenized_ds = ds.map(preprocess_function, batched=True)
+
     login(token="")
 
 
@@ -77,7 +83,7 @@ def startDistillation():
       teacher_model=code_llama_model,
       student_model=tiny_llama_model,
       args=training_args,
-      train_dataset=ds,
+      train_dataset=tokenized_ds,
       data_collator=data_collator,
       tokenizer=tokenizer,
       temperature=5,
