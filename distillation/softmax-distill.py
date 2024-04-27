@@ -104,6 +104,7 @@ def startDistillation():
       temperature=5,
       lambda_param=0.5,
       formatting_func=format_instruction,
+      packing=True,
     )
 
     trainer.train()
