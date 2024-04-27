@@ -1,14 +1,15 @@
 # Code adapted from https://huggingface.co/docs/transformers/main/en/tasks/knowledge_distillation_for_image_classification
 
 from datasets import load_dataset
-from transformers import Seq2SeqTrainingArguments, Seq2SeqTrainer, AutoTokenizer, AutoModelForCausalLM, DataCollatorForSeq2Seq
+from transformers import TrainingArguments, AutoTokenizer, AutoModelForCausalLM, DataCollatorForSeq2Seq
+from trl import SFTTrainer
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from huggingface_hub import login
 
-class SoftMaxDistillationTrainer(Seq2SeqTrainer):
+class SoftMaxDistillationTrainer(SFTTrainer):
     def __init__(self, teacher_model=None, student_model=None, temperature=None, lambda_param=None,  *args, **kwargs):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
@@ -39,7 +40,23 @@ class SoftMaxDistillationTrainer(Seq2SeqTrainer):
         # Calculate final loss
         loss = (1. - self.lambda_param) * student_target_loss + self.lambda_param * distillation_loss
         return (loss, student_output) if return_outputs else loss
-    
+
+
+# Set the instruction format for iamtarun/python_code_instructions_18k_alpaca
+def format_instruction(sample):
+	return f"""### Instruction:
+Use the Task below and the Input given to write the Response, which is a programming code that can solve the following Task:
+
+### Task:
+{sample['instruction']}
+
+### Input:
+{sample['input']}
+
+### Response:
+{sample['output']}
+"""
+
 def startDistillation():
     dataset_name = "iamtarun/python_code_instructions_18k_alpaca"
     # Load the dataset
@@ -52,16 +69,14 @@ def startDistillation():
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=tiny_llama_model)
 
 
-    def preprocess_function(examples):
-        return tokenizer(f"{examples["instruction"]}\n{examples["input"]}\n```\n{examples["output"]}\n```", truncation=True)
-
-    tokenized_ds = ds.map(preprocess_function, batched=True)
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "right"
 
     login(token="")
 
 
 
-    training_args = Seq2SeqTrainingArguments(
+    training_args = TrainingArguments(
       output_dir="model-out",
       num_train_epochs=30,
       learning_rate=2e-5,
@@ -83,11 +98,12 @@ def startDistillation():
       teacher_model=code_llama_model,
       student_model=tiny_llama_model,
       args=training_args,
-      train_dataset=tokenized_ds,
+      train_dataset=ds,
       data_collator=data_collator,
       tokenizer=tokenizer,
       temperature=5,
-      lambda_param=0.5
+      lambda_param=0.5,
+      formatting_func=format_instruction,
     )
 
     trainer.train()
