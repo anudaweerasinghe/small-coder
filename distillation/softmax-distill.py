@@ -65,7 +65,7 @@ def startDistillation():
       fp16=True,
       logging_dir="distilled-model/logs",
       logging_strategy="epoch",
-      eval_strategy="epoch",
+      evaluation_strategy="epoch",
       save_strategy="epoch",
       load_best_model_at_end=True,
       push_to_hub=True,
@@ -76,7 +76,7 @@ def startDistillation():
     trainer = SoftMaxDistillationTrainer(
       teacher_model=code_llama_model,
       student_model=tiny_llama_model,
-      training_args=training_args,
+      args=training_args,
       train_dataset=ds,
       data_collator=data_collator,
       tokenizer=tokenizer,
