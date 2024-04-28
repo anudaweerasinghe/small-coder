@@ -142,7 +142,6 @@ args = TrainingArguments(
     disable_tqdm=disable_tqdm,
     report_to="wandb",
     seed=42,
-    load_best_model_at_end=True,
     push_to_hub=True,
     hub_strategy="every_save",
     hub_model_id=new_model,
