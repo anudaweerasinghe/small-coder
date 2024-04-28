@@ -62,8 +62,8 @@ def startDistillation():
     # Load the dataset
     ds = load_dataset(dataset_name, split="train")
 
-    tiny_llama_model = AutoModelForCausalLM.from_pretrained("TinyLlama/TinyLlama-1.1B-Chat-v1.0")
-    code_llama_model = AutoModelForCausalLM.from_pretrained("codellama/CodeLlama-7b-Python-hf")
+    tiny_llama_model = AutoModelForCausalLM.from_pretrained("TinyLlama/TinyLlama-1.1B-Chat-v1.0", torch_dtype=torch.bfloat16)
+    code_llama_model = AutoModelForCausalLM.from_pretrained("codellama/CodeLlama-7b-Python-hf", torch_dtype=torch.bfloat16)
 
     tokenizer = AutoTokenizer.from_pretrained("codellama/CodeLlama-7b-Python-hf")
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=tiny_llama_model)
@@ -83,7 +83,8 @@ def startDistillation():
       per_device_train_batch_size=1,
       per_device_eval_batch_size=1,
       weight_decay=0.01,
-      fp16=True,
+      fp16=False,
+      bf16=True,
       logging_dir="distilled-model/logs",
       logging_strategy="epoch",
       evaluation_strategy="epoch",
