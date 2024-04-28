@@ -7,3 +7,10 @@ trl
 flash-attn
 bitsandbytes
 scipy
+peft
+accelerate
+bitsandbytes
+safetensors
+ipywidgets
+huggingface_hub
+python-dotenv
