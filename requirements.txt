@@ -4,3 +4,4 @@ evaluate
 torch
 ipykernel
 trl
+flash-attn

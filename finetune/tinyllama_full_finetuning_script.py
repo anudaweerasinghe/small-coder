@@ -87,6 +87,18 @@ Use the Task below and the Input given to write the Response, which is a program
 {sample['output']}
 """
 
+# Get the type
+# compute_dtype = getattr(torch, bnb_4bit_compute_dtype)
+
+# # BitsAndBytesConfig int-4 config
+# bnb_config = BitsAndBytesConfig(
+#     load_in_4bit=use_4bit,
+#     bnb_4bit_use_double_quant=use_double_nested_quant,
+#     bnb_4bit_quant_type=bnb_4bit_quant_type,
+#     bnb_4bit_compute_dtype=compute_dtype
+# )
+ 
+
 # Load the pretrained model
 model = AutoModelForCausalLM.from_pretrained(model_id, use_cache = False, device_map=device_map, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
 model.config.pretraining_tp = 1
@@ -117,7 +129,7 @@ args = TrainingArguments(
     group_by_length=group_by_length,
     lr_scheduler_type=lr_scheduler_type,
     disable_tqdm=disable_tqdm,
-    report_to="tensorboard",
+    # report_to="tensorboard",
     seed=42
 )
 
