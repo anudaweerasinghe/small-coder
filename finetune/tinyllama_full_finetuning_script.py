@@ -1,11 +1,20 @@
 # Install Requirements First
 from datasets import load_dataset
 from random import randrange
+from huggingface_hub import login
+import wandb
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments
 
 from trl import SFTTrainer
+import os
+
+
+os.environ["WANDB_PROJECT"] = "tiny-code-llama"
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
+
+wandb.login(key="")
 
 # The model that you want to train from the Hugging Face hub
 model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
@@ -13,7 +22,7 @@ model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 dataset_name = "iamtarun/python_code_instructions_18k_alpaca"
 #dataset_name = "HuggingFaceH4/CodeAlpaca_20K"
 # Dataset split
-new_model = "full_finetuned-tinyllama"
+new_model = "full_finetuned-code-tinyllama"
 dataset_split= "train"
 # Load the entire model on the GPU 0
 device_map = {"": 0}
@@ -56,7 +65,7 @@ save_steps = 0
 # Log every X updates steps
 logging_steps = 25
 # Disable tqdm
-disable_tqdm= False
+disable_tqdm= True
 
 ################################################################################
 # SFTTrainer parameters
@@ -97,6 +106,8 @@ Use the Task below and the Input given to write the Response, which is a program
 #     bnb_4bit_quant_type=bnb_4bit_quant_type,
 #     bnb_4bit_compute_dtype=compute_dtype
 # )
+
+login(token="")
  
 
 # Load the pretrained model
@@ -129,8 +140,12 @@ args = TrainingArguments(
     group_by_length=group_by_length,
     lr_scheduler_type=lr_scheduler_type,
     disable_tqdm=disable_tqdm,
-    # report_to="tensorboard",
-    seed=42
+    report_to="wandb",
+    seed=42,
+    load_best_model_at_end=True,
+    push_to_hub=True,
+    hub_strategy="every_save",
+    hub_model_id=new_model,
 )
 
 # Create the trainer
@@ -148,5 +163,5 @@ trainer = SFTTrainer(
 trainer.train() # there will not be a progress bar since tqdm is disabled
 
 # save model in local
-trainer.save_model("finetuned-tinyllama")
+trainer.save_model(new_model)
 
