@@ -5,3 +5,4 @@ torch
 ipykernel
 trl
 flash-attn
+bitsandbytes
