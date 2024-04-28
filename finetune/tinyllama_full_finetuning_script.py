@@ -100,7 +100,7 @@ Use the Task below and the Input given to write the Response, which is a program
  
 
 # Load the pretrained model
-model = AutoModelForCausalLM.from_pretrained(model_id, use_cache = False, device_map=device_map, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
+model = AutoModelForCausalLM.from_pretrained(model_id, use_cache = False, torch_dtype=torch.bfloat16,) 
 model.config.pretraining_tp = 1
 
 # Load the tokenizer
