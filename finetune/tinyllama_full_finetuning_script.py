@@ -26,8 +26,8 @@ output_dir = new_model
 # Number of training epochs
 num_train_epochs = 1
 # Enable fp16/bf16 training (set bf16 to True with an A100)
-fp16 = True
-bf16 = False
+fp16 = False 
+bf16 = True
 # Batch size per GPU for training
 per_device_train_batch_size = 4
 # Number of update steps to accumulate the gradients for
@@ -88,7 +88,7 @@ Use the Task below and the Input given to write the Response, which is a program
 """
 
 # Load the pretrained model
-model = AutoModelForCausalLM.from_pretrained(model_id, use_cache = False, device_map=device_map)
+model = AutoModelForCausalLM.from_pretrained(model_id, use_cache = False, device_map=device_map, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
 model.config.pretraining_tp = 1
 
 # Load the tokenizer
