@@ -6,3 +6,4 @@ ipykernel
 trl
 flash-attn
 bitsandbytes
+scipy
