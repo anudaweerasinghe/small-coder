@@ -33,7 +33,7 @@ device_map = {"": 0}
 # Output directory where the model predictions and checkpoints will be stored
 output_dir = new_model
 # Number of training epochs
-num_train_epochs = 1
+num_train_epochs = 4
 # Enable fp16/bf16 training (set bf16 to True with an A100)
 fp16 = False 
 bf16 = True
@@ -46,13 +46,13 @@ gradient_checkpointing = True
 # Maximum gradient normal (gradient clipping)
 max_grad_norm = 0.3
 # Initial learning rate (AdamW optimizer)
-learning_rate = 2e-4 #1e-5
+learning_rate = 2e-5 #1e-5
 # Weight decay to apply to all layers except bias/LayerNorm weights
 weight_decay = 0.001
 # Optimizer to use
 optim = "paged_adamw_32bit"
 # Learning rate schedule
-lr_scheduler_type = "cosine" #"constant"
+lr_scheduler_type = "constant" #"cosine"
 # Number of training steps (overrides num_train_epochs)
 max_steps = -1
 # Ratio of steps for a linear warmup (from 0 to learning rate)
