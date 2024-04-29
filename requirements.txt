@@ -5,3 +5,5 @@ torch
 ipykernel
 trl
 transformers[torch]
+accelerate
+bitsandbytes

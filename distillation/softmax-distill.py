@@ -8,6 +8,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from huggingface_hub import login
+import wandb
+
+import os
+
+
+os.environ["WANDB_PROJECT"] = "tiny-code-llama"
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
 
 class SoftMaxDistillationTrainer(SFTTrainer):
     def __init__(self, teacher_model=None, student_model=None, temperature=None, lambda_param=None,  *args, **kwargs):
@@ -15,8 +22,6 @@ class SoftMaxDistillationTrainer(SFTTrainer):
         self.teacher = teacher_model
         self.student = student_model
         self.loss_function = nn.KLDivLoss(reduction="batchmean")
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.teacher.to(device)
         self.teacher.eval()
         self.temperature = temperature
         self.lambda_param = lambda_param
@@ -63,7 +68,7 @@ def startDistillation():
     ds = load_dataset(dataset_name, split="train")
 
     tiny_llama_model = AutoModelForCausalLM.from_pretrained("TinyLlama/TinyLlama-1.1B-Chat-v1.0", torch_dtype=torch.bfloat16)
-    code_llama_model = AutoModelForCausalLM.from_pretrained("codellama/CodeLlama-7b-Python-hf", torch_dtype=torch.bfloat16)
+    code_llama_model = AutoModelForCausalLM.from_pretrained("codellama/CodeLlama-7b-Python-hf", load_in_8bit=True)
 
     tokenizer = AutoTokenizer.from_pretrained("codellama/CodeLlama-7b-Python-hf")
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=tiny_llama_model)
@@ -73,7 +78,7 @@ def startDistillation():
     tokenizer.padding_side = "right"
 
     login(token="")
-
+    wandb.login(key="")
 
 
     training_args = TrainingArguments(
@@ -92,7 +97,8 @@ def startDistillation():
       load_best_model_at_end=True,
       push_to_hub=True,
       hub_strategy="every_save",
-      hub_model_id="distill-code-tinyllama",
+      hub_model_id="distilled-code-llama",
+      report_to="wandb",
     )
 
     trainer = SoftMaxDistillationTrainer(
