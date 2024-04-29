@@ -83,7 +83,7 @@ def startDistillation():
 
     training_args = TrainingArguments(
       output_dir="model-out",
-      num_train_epochs=30,
+      num_train_epochs=4,
       learning_rate=2e-5,
       per_device_train_batch_size=1,
       per_device_eval_batch_size=1,
@@ -91,8 +91,7 @@ def startDistillation():
       fp16=False,
       bf16=True,
       logging_dir="distilled-model/logs",
-      logging_strategy="epoch",
-      evaluation_strategy="epoch",
+      logging_steps=10,
       save_strategy="epoch",
       load_best_model_at_end=True,
       push_to_hub=True,
