@@ -1,11 +1,20 @@
 # Install Requirements First
 from datasets import load_dataset
 from random import randrange
+from huggingface_hub import login
+import wandb
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments
 
 from trl import SFTTrainer
+import os
+
+
+os.environ["WANDB_PROJECT"] = "tiny-code-llama"
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"  # log all model checkpoints
+
+wandb.login(key="")
 
 # The model that you want to train from the Hugging Face hub
 model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
@@ -13,7 +22,7 @@ model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 dataset_name = "iamtarun/python_code_instructions_18k_alpaca"
 #dataset_name = "HuggingFaceH4/CodeAlpaca_20K"
 # Dataset split
-new_model = "full_finetuned-tinyllama"
+new_model = "full_finetuned-code-tinyllama"
 dataset_split= "train"
 # Load the entire model on the GPU 0
 device_map = {"": 0}
@@ -24,10 +33,10 @@ device_map = {"": 0}
 # Output directory where the model predictions and checkpoints will be stored
 output_dir = new_model
 # Number of training epochs
-num_train_epochs = 1
+num_train_epochs = 4
 # Enable fp16/bf16 training (set bf16 to True with an A100)
-fp16 = True
-bf16 = False
+fp16 = False 
+bf16 = True
 # Batch size per GPU for training
 per_device_train_batch_size = 4
 # Number of update steps to accumulate the gradients for
@@ -37,13 +46,13 @@ gradient_checkpointing = True
 # Maximum gradient normal (gradient clipping)
 max_grad_norm = 0.3
 # Initial learning rate (AdamW optimizer)
-learning_rate = 2e-4 #1e-5
+learning_rate = 2e-5 #1e-5
 # Weight decay to apply to all layers except bias/LayerNorm weights
 weight_decay = 0.001
 # Optimizer to use
 optim = "paged_adamw_32bit"
 # Learning rate schedule
-lr_scheduler_type = "cosine" #"constant"
+lr_scheduler_type = "constant" #"cosine"
 # Number of training steps (overrides num_train_epochs)
 max_steps = -1
 # Ratio of steps for a linear warmup (from 0 to learning rate)
@@ -56,7 +65,7 @@ save_steps = 0
 # Log every X updates steps
 logging_steps = 25
 # Disable tqdm
-disable_tqdm= False
+disable_tqdm= True
 
 ################################################################################
 # SFTTrainer parameters
@@ -87,8 +96,22 @@ Use the Task below and the Input given to write the Response, which is a program
 {sample['output']}
 """
 
+# Get the type
+# compute_dtype = getattr(torch, bnb_4bit_compute_dtype)
+
+# # BitsAndBytesConfig int-4 config
+# bnb_config = BitsAndBytesConfig(
+#     load_in_4bit=use_4bit,
+#     bnb_4bit_use_double_quant=use_double_nested_quant,
+#     bnb_4bit_quant_type=bnb_4bit_quant_type,
+#     bnb_4bit_compute_dtype=compute_dtype
+# )
+
+login(token="")
+ 
+
 # Load the pretrained model
-model = AutoModelForCausalLM.from_pretrained(model_id, use_cache = False, device_map=device_map)
+model = AutoModelForCausalLM.from_pretrained(model_id, use_cache = False, torch_dtype=torch.bfloat16,) 
 model.config.pretraining_tp = 1
 
 # Load the tokenizer
@@ -117,8 +140,11 @@ args = TrainingArguments(
     group_by_length=group_by_length,
     lr_scheduler_type=lr_scheduler_type,
     disable_tqdm=disable_tqdm,
-    report_to="tensorboard",
-    seed=42
+    report_to="wandb",
+    seed=42,
+    push_to_hub=True,
+    hub_strategy="every_save",
+    hub_model_id=new_model,
 )
 
 # Create the trainer
@@ -136,5 +162,5 @@ trainer = SFTTrainer(
 trainer.train() # there will not be a progress bar since tqdm is disabled
 
 # save model in local
-trainer.save_model("finetuned-tinyllama")
+trainer.save_model(new_model)
 

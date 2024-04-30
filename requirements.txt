@@ -1,5 +1,16 @@
-transformers
+transformers==4.31.0
 datasets
 evaluate
 torch
 ipykernel
+trl
+bitsandbytes
+scipy
+peft
+accelerate
+bitsandbytes
+safetensors
+ipywidgets
+huggingface_hub
+python-dotenv
+wandb
