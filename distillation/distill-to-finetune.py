@@ -84,8 +84,8 @@ def startDistillation():
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
 
-    login(token="")
-    wandb.login(key="")
+    login(token=os.environ.get("HF_TOKEN"))
+    wandb.login(key=os.environ.get("WANDB_KEY"))
 
 
     training_args = TrainingArguments(
