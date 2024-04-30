@@ -49,18 +49,24 @@ class SoftMaxDistillationTrainer(SFTTrainer):
 
 # Set the instruction format for iamtarun/python_code_instructions_18k_alpaca
 def format_instruction(sample):
-	return f"""### Instruction:
+    
+    outputs = []
+
+    for i in range(len(sample['output'])):
+        outputs.append(f"""### Instruction:
 Use the Task below and the Input given to write the Response, which is a programming code that can solve the following Task:
 
 ### Task:
-{sample['instruction']}
+{sample['instruction'][i]}
 
 ### Input:
-{sample['input']}
+{sample['input'][i]}
 
 ### Response:
-{sample['output']}
-"""
+{sample['output'][i]}
+""")
+        
+    return outputs
 
 def startDistillation():
     dataset_name = "iamtarun/python_code_instructions_18k_alpaca"
@@ -83,8 +89,8 @@ def startDistillation():
 
     training_args = TrainingArguments(
       output_dir="model-out",
-      num_train_epochs=4,
-      learning_rate=2e-5,
+      num_train_epochs=6,
+      learning_rate=2e-6,
       per_device_train_batch_size=1,
       per_device_eval_batch_size=1,
       weight_decay=0.001,
@@ -98,7 +104,6 @@ def startDistillation():
       hub_strategy="every_save",
       hub_model_id="distilled-code-llama",
       report_to="wandb",
-      optim="paged_adamw_32bit",
       lr_scheduler_type="constant",
       warmup_ratio=0.03,
       gradient_accumulation_steps=1,
@@ -112,10 +117,10 @@ def startDistillation():
       train_dataset=ds,
       data_collator=data_collator,
       tokenizer=tokenizer,
-      temperature=5,
-      lambda_param=0.5,
+      temperature=3,
+      lambda_param=0.25,
       formatting_func=format_instruction,
-      packing=True,
+      packing=False,
     )
 
     trainer.train()
