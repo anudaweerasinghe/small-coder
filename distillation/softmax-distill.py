@@ -1,7 +1,7 @@
 # Code adapted from https://huggingface.co/docs/transformers/main/en/tasks/knowledge_distillation_for_image_classification
 
 from datasets import load_dataset
-from transformers import TrainingArguments, AutoTokenizer, AutoModelForCausalLM, DataCollatorForLanguageModeling 
+from transformers import TrainingArguments, AutoTokenizer, AutoModelForCausalLM, DataCollatorForLanguageModeling
 from trl import SFTTrainer
 import torch
 import torch.nn as nn
@@ -49,7 +49,7 @@ class SoftMaxDistillationTrainer(SFTTrainer):
 
 # Set the instruction format for iamtarun/python_code_instructions_18k_alpaca
 def format_instruction(sample):
-    
+
     outputs = []
 
     for i in range(len(sample['output'])):
@@ -65,7 +65,7 @@ Use the Task below and the Input given to write the Response, which is a program
 ### Response:
 {sample['output'][i]}
 """)
-        
+
     return outputs
 
 def startDistillation():
@@ -90,14 +90,14 @@ def startDistillation():
     training_args = TrainingArguments(
       output_dir="model-out",
       num_train_epochs=6,
-      learning_rate=2e-6,
+      learning_rate=2e-5,
       per_device_train_batch_size=1,
       per_device_eval_batch_size=1,
       weight_decay=0.001,
       fp16=False,
       bf16=True,
       logging_dir="distilled-model/logs",
-      logging_steps=10,
+      logging_steps=1,
       save_strategy="epoch",
       # load_best_model_at_end=True,
       push_to_hub=True,
@@ -106,7 +106,7 @@ def startDistillation():
       report_to="wandb",
       lr_scheduler_type="constant",
       warmup_ratio=0.03,
-      gradient_accumulation_steps=1,
+      gradient_accumulation_steps=32,
       gradient_checkpointing=True,
     )
 
@@ -118,7 +118,7 @@ def startDistillation():
       data_collator=data_collator,
       tokenizer=tokenizer,
       temperature=3,
-      lambda_param=0.25,
+      lambda_param=0.5,
       formatting_func=format_instruction,
       packing=False,
     )
