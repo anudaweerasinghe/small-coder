@@ -1,7 +1,7 @@
 # Code adapted from https://huggingface.co/docs/transformers/main/en/tasks/knowledge_distillation_for_image_classification
 
 from datasets import load_dataset
-from transformers import TrainingArguments, AutoTokenizer, AutoModelForCausalLM, DataCollatorForSeq2Seq
+from transformers import TrainingArguments, AutoTokenizer, AutoModelForCausalLM, DataCollatorForLanguageModeling 
 from trl import SFTTrainer
 import torch
 import torch.nn as nn
@@ -77,7 +77,7 @@ def startDistillation():
     code_llama_model = AutoModelForCausalLM.from_pretrained("codellama/CodeLlama-7b-Python-hf", load_in_8bit=True)
 
     tokenizer = AutoTokenizer.from_pretrained("codellama/CodeLlama-7b-Python-hf")
-    data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=tiny_llama_model)
+    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
 
     tokenizer.pad_token = tokenizer.eos_token
