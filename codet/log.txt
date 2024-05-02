@@ -1,0 +1,7 @@
+Tried anudaw/full_finetuned-code-tinyllama with default temp, top_p=0.95.
+SystemLog: [2024-04-30 18:21:52][__main__][INFO] - pass rates of ranked solutions
+SystemLog: [2024-04-30 18:21:52][src.evaluation][INFO] - {'pass@1': 0.1395, 'pass@2': 0.1796, 'pass@10': 0.2475}
+SystemLog: [2024-04-30 18:21:52][__main__][INFO] - pass rates of random solutions
+SystemLog: [2024-04-30 18:21:52][src.evaluation][INFO] - {'pass@1': 0.0902, 'pass@10': 0.2345}
+
+Tried anudaw/full_finetuned-code-tinyllama with temp=0.2
