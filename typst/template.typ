@@ -1,7 +1,7 @@
 // The project function defines how your document looks.
 // It takes your content and some metadata and formats it.
 // Go ahead and customize it to your liking!
-#let project(title: "", subtitle: "Project Proposal | 10-423: Generative AI", authors: (), date: none, body) = {
+#let project(title: "", subtitle: "Final Executive Summary | 10-423/623: Generative AI", authors: (), date: none, body) = {
   // Set the document's basic properties.
   set document(author: authors.map(a => a.name), title: title)
   set page(numbering: "1", number-align: center)

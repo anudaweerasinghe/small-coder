@@ -7,7 +7,7 @@
     (name: "Bradley Teo", email: "bradleyt@andrew.cmu.edu"),
     (name: "Anuda Weerasinghe", email: "wweerasi@andrew.cmu.edu"),
   ),
-  date: "April 4, 2024",
+  date: "May 3, 2024",
 )
 #set cite(style: "chicago-notes")
 #show link: underline
@@ -16,8 +16,11 @@
 #include "sections/2-dataset_task.typ"
 #include "sections/3-lit_review.typ"
 #include "sections/4-approach.typ"
-#include "sections/5-outcomes.typ"
-#include "sections/6-plan.typ"
+#include "sections/5-experiments.typ"
+#include "sections/6-code_overview.typ"
+#include "sections/7-timeline.typ"
+#include "sections/8-research-log.typ"
+#include "sections/9-conclusion.typ"
 
 #pagebreak()
 // Add bibliography and create Bibiliography section
