@@ -1,4 +1,4 @@
-transformers
+transformers==4.31.0
 datasets
 evaluate
 torch
@@ -10,3 +10,9 @@ bitsandbytes
 wandb
 numpy
 matplotlib
+scipy
+peft
+safetensors
+ipywidgets
+huggingface_hub
+python-dotenv
